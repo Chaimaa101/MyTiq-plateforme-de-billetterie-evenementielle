@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('newsletters', function (Blueprint $table) {
             $table->id();
              $table->string('email');
-            $table->enum('status', ['pending', 'subscribed', 'unsubscribed'])->default('pending');
+            $table->enum('status', ['pending', 'confirmed'])->default('pending');
             $table->timestamps();
         });
     }
