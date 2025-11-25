@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('newsletter_subscriptions', function (Blueprint $table) {
             $table->id();
+            $table->string('email');
+            $table->enum('status', ['pending', 'subscribed', 'unsubscribed'])->default('pending');
             $table->timestamps();
         });
     }
