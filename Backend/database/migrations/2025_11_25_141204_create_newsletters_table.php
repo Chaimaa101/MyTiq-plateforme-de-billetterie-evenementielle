@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('newsletters', function (Blueprint $table) {
             $table->id();
-             $table->string('email');
+             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['pending', 'confirmed'])->default('pending');
             $table->timestamps();
         });
