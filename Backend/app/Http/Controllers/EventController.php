@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class EventController extends Controller
 {
@@ -13,23 +14,32 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        $events = Event::orderBy('date', 'asc')->get();
+
+        return response()->json([
+            'data'    => $events
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreEventRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $cloudinary = Cloudinary::upload($request->file('image')->getRealPath());
+            $validated['image'] = $cloudinary->getSecurePath(); // Save URL only
+        }
+
+        $event = Event::create($validated);
+
+        return response()->json([
+            'message' => 'Événement créé avec succès.',
+            'data'    => $event
+        ], 201);
     }
 
     /**
@@ -37,15 +47,9 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Event $event)
-    {
-        //
+        return response()->json([
+            'data'    => $event
+        ], 200);
     }
 
     /**
@@ -53,7 +57,20 @@ class EventController extends Controller
      */
     public function update(UpdateEventRequest $request, Event $event)
     {
-        //
+        $validated = $request->validated();
+
+        if ($request->hasFile('image')) {
+
+            $cloudinary = Cloudinary::upload($request->file('image')->getRealPath());
+            $validated['image'] = $cloudinary->getSecurePath();
+        }
+
+        $event->update($validated);
+
+        return response()->json([
+            'message' => 'Événement mis à jour.',
+            'data'    => $event
+        ], 200);
     }
 
     /**
@@ -61,6 +78,10 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        //
+        $event->delete();
+
+        return response()->json([
+            'message' => 'Événement supprimé.'
+        ], 200);
     }
 }
